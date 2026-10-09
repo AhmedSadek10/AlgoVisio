@@ -43,6 +43,16 @@ See [the architecture and component guide](docs/architecture.md) for contracts a
 
 Requires Node.js 20.19+ and npm.
 
+## Deploy to GitHub Pages
+
+Run `npm run deploy` to build the production app for `/AlgoVisio/` and publish it to the repository's `gh-pages` branch. GitHub authentication and push access to `origin` are required.
+
+In the repository's **Settings → Pages**, select **Deploy from a branch**, choose **gh-pages** and **/ (root)**, then save. The site will be available at https://AhmedSadek10.github.io/AlgoVisio/ after GitHub finishes publishing.
+
+Lesson URLs use hash routing so direct links and refreshes work on static hosting, for example `/AlgoVisio/#/algorithms/binary-search`. Run `npm run build:pages` to build locally without publishing, or `npm run deploy -- --dry-run` to check deployment without pushing. Run `npm run deploy` again to publish future updates.
+
+## Local development commands
+
 ```bash
 npm ci
 npm start

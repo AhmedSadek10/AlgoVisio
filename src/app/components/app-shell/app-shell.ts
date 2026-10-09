@@ -34,7 +34,7 @@ export class AppShell implements AfterViewInit, OnDestroy {
   private readonly navigation: Subscription;
   readonly searchQuery = signal('');
   readonly notice = signal('');
-  readonly currentSlug = signal(this.router.url.split('/').pop() || 'binary-search');
+  readonly currentSlug = signal(this.router.url.split('/').pop() || 'bubble-sort');
   readonly currentTopic = computed(
     () =>
       ALGORITHM_CATALOG.find((topic) => topic.slug === this.currentSlug()) ?? ALGORITHM_CATALOG[0],
@@ -55,7 +55,7 @@ export class AppShell implements AfterViewInit, OnDestroy {
     this.navigation = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.currentSlug.set(this.router.url.split('/').pop() || 'binary-search');
+        this.currentSlug.set(this.router.url.split('/').pop() || 'bubble-sort');
         this.scrollToCurrentLesson();
       });
   }

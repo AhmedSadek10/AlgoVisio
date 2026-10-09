@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:pages": "ng build --base-href=/AlgoVisio/",
+    "deploy": "ng deploy --base-href=/AlgoVisio/",
     "watch": "ng build --watch --configuration development",
     "format": "prettier --write \"src/**/*.{ts,html,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,css}\"",
@@ -42,6 +44,7 @@
     "@angular/build": "^20.3.37",
     "@angular/cli": "^20.3.37",
     "@angular/compiler-cli": "^20.3.0",
+    "angular-cli-ghpages": "^3.1.1",
     "prettier": "^3.6.2",
     "typescript": "~5.9.2"
   }

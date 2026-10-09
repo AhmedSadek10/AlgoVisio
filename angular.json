@@ -64,6 +64,14 @@
           },
           "defaultConfiguration": "development"
         },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {
+            "buildTarget": "algovisio:build:production",
+            "baseHref": "/AlgoVisio/",
+            "branch": "gh-pages"
+          }
+        },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
         }

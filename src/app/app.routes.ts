@@ -84,7 +84,7 @@ export const routes: Routes = [
             (module) => module.BellmanFordPage,
           ),
       },
-      { path: '', pathMatch: 'full', redirectTo: 'algorithms/binary-search' },
+      { path: '', pathMatch: 'full', redirectTo: 'algorithms/bubble-sort' },
       {
         path: 'algorithms/binary-search',
         title: 'Binary Search Visualizer | AlgoVisio',
@@ -139,5 +139,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'algorithms/binary-search' },
+  { path: '**', redirectTo: 'algorithms/bubble-sort' },
 ];
