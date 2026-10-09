@@ -1,0 +1,35 @@
+<section
+  class="workspace"
+  #workspace
+  [class.expanded]="expanded()"
+  (keydown.escape)="expanded.set(false)"
+>
+  <header class="workspace-heading">
+    <h2>{{ title() }}</h2>
+    <div class="workspace-actions">
+      <button type="button" (click)="expanded.set(!expanded())" [attr.aria-pressed]="expanded()">
+        {{ expanded() ? 'Exit expanded view' : 'Expand workspace' }}
+      </button>
+      <button type="button" (click)="resetWorkspace(workspace)">Reset size</button>
+    </div>
+  </header>
+  <ng-content />
+  @if (!expanded()) {
+    <button
+      class="resize-handle"
+      type="button"
+      aria-label="Resize entire workspace"
+      (pointerdown)="beginWorkspaceResize($event, workspace)"
+      (pointermove)="resizeWorkspace($event, workspace)"
+      (pointerup)="endWorkspaceResize()"
+      (pointercancel)="endWorkspaceResize()"
+      (lostpointercapture)="endWorkspaceResize()"
+      (keydown.arrowleft)="resizeWorkspaceByKey($event, workspace, -40, 0)"
+      (keydown.arrowright)="resizeWorkspaceByKey($event, workspace, 40, 0)"
+      (keydown.arrowup)="resizeWorkspaceByKey($event, workspace, 0, -40)"
+      (keydown.arrowdown)="resizeWorkspaceByKey($event, workspace, 0, 40)"
+    >
+      ◢
+    </button>
+  }
+</section>

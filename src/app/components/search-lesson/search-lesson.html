@@ -1,0 +1,174 @@
+<div class="content">
+  <app-algorithm-intro [algorithm]="algorithm()" />
+  <article class="lesson-article" [attr.aria-label]="'About ' + algorithm().name">
+    <div>
+      <span class="kicker">THE CONCEPT</span>
+      <h2>{{ algorithm().name }}: the idea</h2>
+      <p>{{ lesson().idea }}</p>
+      <ol>
+        @for (item of lesson().ideaSteps; track $index) {
+          <li>{{ item }}</li>
+        }
+      </ol>
+      <button type="button" (click)="workspace.expanded.set(true)">Open full-view dry run ↓</button>
+    </div>
+    <aside>
+      <h3>{{ lesson().insightTitle }}</h3>
+      <p>{{ lesson().insight }}</p>
+      @if (lesson().requiresSorted) {
+        <p><strong>Requires a sorted array.</strong> Unsorted input is sorted with a warning.</p>
+      }
+    </aside>
+  </article>
+  <ng-template #arrayPanel
+    ><app-array-visualizer
+      [items]="arrayItems()"
+      [operation]="'Find ' + target() + ' · ' + step().title"
+  /></ng-template>
+  <ng-template #codePanel
+    ><app-algorithm-code
+      [compact]="true"
+      [implementations]="implementations()"
+      [codeKey]="step().activeLine.toString()"
+      [inputCode]="inputCode()"
+      [language]="codeLanguage()"
+      (languageChange)="codeLanguage.set($event)"
+      [label]="algorithm().name + ' source code'"
+  /></ng-template>
+  <ng-template #explanationPanel
+    ><app-step-explanation
+      [title]="step().title"
+      [explanation]="step().description"
+      [phase]="step().phase"
+      [variables]="variables()"
+  /></ng-template>
+  <ng-template #memoryPanel
+    ><app-memory-table [columns]="memoryColumns" [rows]="memory()"
+  /></ng-template>
+  <app-algorithm-workspace #workspace id="visualizer" [title]="algorithm().name + ' · dry run'">
+    <div class="setup">
+      <div class="preset-area">
+        <label>TRY A SCENARIO</label>
+        <div class="presets">
+          @for (preset of examples(); track preset.label; let i = $index) {
+            <button
+              [class.chosen]="selectedExample() === i"
+              [attr.aria-pressed]="selectedExample() === i"
+              (click)="selectExample(i)"
+            >
+              {{ preset.label }}
+            </button>
+          }
+        </div>
+      </div>
+      <div class="target-area">
+        <label for="target">TARGET VALUE</label>
+        <div class="target-input">
+          <input
+            id="target"
+            type="number"
+            min="-999"
+            max="999"
+            [value]="targetDraft()"
+            (input)="setTargetDraft($event)"
+            (keydown.enter)="applyTarget()"
+          />
+          <button (click)="applyTarget()" aria-label="Apply target">↵</button>
+        </div>
+      </div>
+      <button class="new-array" (click)="randomize()" title="Generate a new list">
+        ↻ <span>New array</span>
+      </button>
+    </div>
+
+    <section class="current-example" aria-label="Current example" aria-live="polite">
+      <div class="example-heading">
+        <span class="section-kicker">CURRENT EXAMPLE</span>
+        <strong>{{ examples()[selectedExample()]?.label ?? 'Custom array' }}</strong>
+        <span class="example-count">{{ values().length }} values</span>
+      </div>
+      <div class="example-values">
+        <span>{{ lesson().requiresSorted ? 'Sorted search array' : 'Search array' }}</span>
+        <code>[{{ values().join(', ') }}]</code>
+      </div>
+      <div class="example-target">
+        Search target <strong>{{ target() }}</strong>
+      </div>
+      @if (listWarning()) {
+        <p class="example-note">Your input was sorted in ascending order before searching.</p>
+      }
+    </section>
+    <details class="input-editor">
+      <summary>Edit list · {{ values().length }} values</summary>
+      <div class="custom-list">
+        <div class="custom-list-heading">
+          <label for="custom-values">YOUR LIST</label>
+          <span id="custom-list-hint">1–30 whole numbers · commas or spaces</span>
+        </div>
+        <div class="custom-list-controls">
+          <input
+            id="custom-values"
+            type="text"
+            maxlength="240"
+            placeholder="Example: 18, 4, 32, 9, 25"
+            aria-describedby="custom-list-hint"
+            [value]="listDraft()"
+            (input)="setListDraft($event)"
+            (keydown.enter)="applyList()"
+          />
+          <button type="button" (click)="applyList()">Use this list <span>→</span></button>
+        </div>
+        @if (lesson().requiresSorted) {
+          <p class="sorted-requirement">
+            {{ algorithm().name }} only works on sorted arrays. If your list is unsorted, we’ll sort
+            it before searching.
+          </p>
+        } @else {
+          <p class="sorted-requirement">
+            Linear search works with sorted or unsorted lists. We’ll keep your values in the order
+            you entered them.
+          </p>
+        }
+        @if (listWarning()) {
+          <div class="sort-warning" role="alert">
+            <span class="sort-warning-icon" aria-hidden="true">!</span>
+            <p>
+              <strong>Your list was unsorted.</strong> {{ algorithm().name }} requires sorted
+              values, so we sorted it in ascending order before searching.
+            </p>
+          </div>
+        }
+      </div>
+    </details>
+    <app-playback-controls
+      [index]="playback.index()"
+      [total]="steps().length"
+      [playing]="playback.isPlaying()"
+      [speed]="playback.speed()"
+      (reset)="playback.reset()"
+      (previous)="playback.previous()"
+      (next)="playback.next()"
+      (play)="playback.togglePlay()"
+      (seek)="playback.seek($event)"
+      (speedChange)="playback.setSpeed($event)"
+    />
+    <app-algorithm-workbench [panels]="panels()" />
+  </app-algorithm-workspace>
+  <app-lesson-practice [problems]="lesson().practice" />
+  <section id="roadmap" class="next">
+    <div>
+      <small>WHAT’S NEXT</small>
+      <h2>Take the next step into graphs.</h2>
+      <p>Explore traversal and shortest paths with interactive graph lessons.</p>
+    </div>
+    <div>
+      <a routerLink="/algorithms/depth-first-search">DFS ↗</a>
+      <a routerLink="/algorithms/breadth-first-search">BFS ↗</a>
+      <a routerLink="/algorithms/dijkstra">Dijkstra ↗</a>
+    </div>
+  </section>
+  <footer>ALGOVISIO <span>·</span> MADE TO MAKE ALGORITHMS CLICK</footer>
+</div>
+@if (notice()) {
+  <div class="toast" role="status">{{ notice() }}</div>
+}

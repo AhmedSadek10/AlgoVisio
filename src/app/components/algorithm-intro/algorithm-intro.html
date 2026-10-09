@@ -1,0 +1,36 @@
+<section class="intro">
+  <div class="eyebrow">
+    <i></i>
+    {{ algorithm().category === 'Graphs' ? 'GRAPH' : algorithm().category.toUpperCase() }}
+    ALGORITHMS <span>/ {{ lessonNumber() }}</span>
+  </div>
+  <div class="intro-flex">
+    <div>
+      <h1>{{ algorithm().name }}<span>.</span></h1>
+      <p>{{ algorithm().description }}</p>
+      @if (algorithm().requirement) {
+        <p class="intro-requirement">{{ algorithm().requirement }}</p>
+      }
+    </div>
+    @if (algorithm().timeComplexity || algorithm().spaceComplexity) {
+      <div class="complexities">
+        @if (algorithm().timeComplexity) {
+          <div class="complexity">
+            <span>◷</span>
+            <div>
+              TIME COMPLEXITY<strong>{{ algorithm().timeComplexity }}</strong>
+            </div>
+          </div>
+        }
+        @if (algorithm().spaceComplexity) {
+          <div class="complexity">
+            <span>▣</span>
+            <div>
+              SPACE COMPLEXITY<strong>{{ algorithm().spaceComplexity }}</strong>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>

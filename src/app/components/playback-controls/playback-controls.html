@@ -1,0 +1,48 @@
+<div class="playback">
+  <div class="buttons">
+    <button type="button" (click)="reset.emit()" aria-label="Reset visualization">↺</button
+    ><button
+      type="button"
+      (click)="previous.emit()"
+      [disabled]="index() === 0"
+      aria-label="Previous step"
+      aria-keyshortcuts="ArrowLeft"
+      title="Previous step (←)"
+    >
+      ‹</button
+    ><button class="play" type="button" (click)="play.emit()">
+      {{ playing() ? 'Ⅱ Pause' : '▶ Run steps' }}</button
+    ><button
+      type="button"
+      (click)="next.emit()"
+      [disabled]="index() === total() - 1"
+      aria-label="Next step"
+      aria-keyshortcuts="ArrowRight"
+      title="Next step (→)"
+    >
+      ›
+    </button>
+  </div>
+  <label class="timeline"
+    ><span>STEP {{ index() }} / {{ total() - 1 }}</span
+    ><input
+      type="range"
+      min="0"
+      [max]="total() - 1"
+      [value]="index()"
+      (input)="seek.emit(+$any($event.target).value)"
+      aria-label="Visualization step" /></label
+  ><label class="speed"
+    ><span>SPEED</span
+    ><input
+      type="range"
+      min="0.5"
+      max="2"
+      step="0.5"
+      [value]="speed()"
+      (input)="speedChange.emit(+$any($event.target).value)"
+      aria-label="Animation speed"
+    /><strong>{{ speed() }}×</strong></label
+  >
+  <span class="keyboard-hint">← Previous · Next →</span>
+</div>

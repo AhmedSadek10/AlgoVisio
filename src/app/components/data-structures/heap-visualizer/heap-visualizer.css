@@ -1,0 +1,64 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.heap {
+  background: var(--surface-subtle, #f5faf8);
+  border-radius: 8px;
+  padding: 8px;
+  color: var(--text-muted, #567f7d);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+h3 {
+  font-size: 15px;
+  margin: 3px 0 9px;
+  color: var(--text-primary, #315e64);
+}
+header span {
+  font-size: 10px;
+  background: var(--surface-subtle, #e1f0e9);
+  padding: 4px;
+  border-radius: 5px;
+}
+.operation {
+  font-size: 11px;
+  padding: 7px;
+  background: var(--surface-warning, #fff5dc);
+  border-radius: 6px;
+  margin: 4px 0;
+}
+small {
+  font:
+    9px 'DM Mono',
+    monospace;
+  color: var(--text-muted, #789993);
+}
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  font-size: 35px;
+  color: var(--text-muted, #94b0a6);
+}
+.empty strong {
+  font-size: 13px;
+  margin-top: 10px;
+}
+.removed,
+.note {
+  font-size: 10px;
+  margin: 5px 0;
+  color: var(--text-muted, #72958b);
+}
+.removed {
+  background: var(--surface-subtle, #e7f2ed);
+  border-radius: 5px;
+  padding: 6px;
+}

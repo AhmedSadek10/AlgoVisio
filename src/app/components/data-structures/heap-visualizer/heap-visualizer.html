@@ -1,0 +1,20 @@
+<section class="heap" aria-label="Heap visualization">
+  <header>
+    <h3>Binary {{ snapshot().order }} heap</h3>
+    <span>{{ snapshot().items.length }} entries</span>
+  </header>
+  @if (snapshot().operation) {
+    <p class="operation">{{ snapshot().operation }}</p>
+  }
+  @if (snapshot().items.length) {
+    <app-tree-visualizer [snapshot]="tree()" />
+  } @else {
+    <div class="empty">∅<strong>The heap is empty</strong></div>
+  }
+  <small>THE SAME HEAP AS AN ARRAY</small
+  ><app-array-visualizer [items]="array()" [compact]="true" />
+  @if (snapshot().removed; as removed) {
+    <p class="removed">Popped: ({{ removed.detail }}, {{ removed.label }})</p>
+  }
+  <p class="note">Dashed entries have an outdated priority.</p>
+</section>

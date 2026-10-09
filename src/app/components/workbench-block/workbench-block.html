@@ -1,0 +1,29 @@
+<section class="block" [class.resizing]="resizing()" [attr.aria-label]="title() + ' block'">
+  <header
+    class="block-header"
+    (pointerdown)="reorderStart.emit($event)"
+    (pointermove)="reorderMove.emit($event)"
+    (pointerup)="reorderEnd.emit($event)"
+    (pointercancel)="reorderEnd.emit($event)"
+    (lostpointercapture)="reorderEnd.emit($event)"
+  >
+    <span class="drag-grip" aria-hidden="true">⠿</span><strong>{{ title() }}</strong>
+  </header>
+  <div class="block-content"><ng-content /></div>
+  <button
+    class="resize-handle"
+    type="button"
+    [attr.aria-label]="'Resize ' + title()"
+    (pointerdown)="beginResize($event)"
+    (pointermove)="updateResize($event)"
+    (pointerup)="endResize()"
+    (pointercancel)="endResize()"
+    (lostpointercapture)="endResize()"
+    (keydown.arrowup)="resizeByKey($event, 0, -30)"
+    (keydown.arrowdown)="resizeByKey($event, 0, 30)"
+    (keydown.arrowleft)="resizeByKey($event, -1, 0)"
+    (keydown.arrowright)="resizeByKey($event, 1, 0)"
+  >
+    ◢
+  </button>
+</section>

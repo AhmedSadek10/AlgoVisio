@@ -1,0 +1,51 @@
+<section
+  class="sequence"
+  [class.compact]="compact()"
+  [class.stack]="snapshot().kind === 'stack'"
+  [attr.aria-label]="snapshot().kind + ' visualization'"
+>
+  <div class="summary">
+    <strong>{{ snapshot().items.length }} items</strong><span>{{ rule() }}</span>
+  </div>
+  @if (snapshot().operation) {
+    <p class="operation">{{ snapshot().operation }}</p>
+  }
+  <div class="items">
+    @for (item of displayed(); track item.id; let i = $index; let last = $last) {
+      <div class="entry" [attr.data-state]="item.state || 'idle'">
+        <span class="marker">{{
+          item.marker ||
+            (snapshot().kind === 'stack' && i === 0
+              ? 'TOP'
+              : snapshot().kind === 'queue'
+                ? i === 0
+                  ? 'FRONT'
+                  : last
+                    ? 'BACK'
+                    : ''
+                : '')
+        }}</span>
+        <div class="cell">
+          <strong>{{ item.label }}</strong>
+          @if (item.detail) {
+            <small>{{ item.detail }}</small>
+          }
+        </div>
+        <span class="index">{{ snapshot().kind === 'array' ? i : '' }}</span>
+      </div>
+      @if (snapshot().kind === 'linked-list' && !last) {
+        <span class="link">→</span>
+      }
+    } @empty {
+      <div class="empty">Empty {{ snapshot().kind }}</div>
+    }
+  </div>
+  @if (snapshot().removed; as removed) {
+    <div class="removed">
+      Removed: <strong>{{ removed.label }}</strong> {{ removed.detail }}
+    </div>
+  }
+  <div class="legend">
+    <span>Amber: current</span><span>Teal: visited / found</span><span>Faded: eliminated</span>
+  </div>
+</section>

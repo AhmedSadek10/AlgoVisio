@@ -1,0 +1,41 @@
+<div class="layout-toolbar">
+  <span
+    >Drag headers onto a block to swap, or into empty space to move. Resize with ◢ or arrow
+    keys.</span
+  ><button type="button" (click)="resetLayout()">Reset layout</button>
+</div>
+<div class="workbench" #grid [style.height.px]="layoutHeight()">
+  @if (spacePreview(); as preview) {
+    <div
+      class="space-preview"
+      aria-hidden="true"
+      [style.left]="
+        'calc(' + ((preview.column - 1) * 100) / 12 + '% + ' + (preview.column - 1) + 'px)'
+      "
+      [style.width]="'calc(' + (preview.span * 100) / 12 + '% + ' + (preview.span - 12) + 'px)'"
+      [style.top.px]="preview.top"
+      [style.height.px]="preview.height"
+    >
+      Drop {{ preview.title }} here
+    </div>
+  }
+  @for (block of positionedBlocks(); track block.id) {
+    <app-workbench-block
+      [title]="block.title"
+      [style.left]="'calc(' + ((block.column - 1) * 100) / 12 + '% + ' + (block.column - 1) + 'px)'"
+      [style.width]="'calc(' + (block.span * 100) / 12 + '% + ' + (block.span - 12) + 'px)'"
+      [style.top.px]="block.top"
+      [style.height.px]="block.height"
+      [style.--panel-height]="block.height + 'px'"
+      [class.drop-target]="dropTarget() === block.id"
+      [class.dragging]="dragged() === block.id"
+      [attr.data-block-id]="block.id"
+      (reorderStart)="beginDrag($event, block.id)"
+      (reorderMove)="allowDrop($event)"
+      (reorderEnd)="drop($event)"
+      (resize)="resizeBlock(block.id, $event, grid.clientWidth)"
+    >
+      <ng-container [ngTemplateOutlet]="block.template" />
+    </app-workbench-block>
+  }
+</div>

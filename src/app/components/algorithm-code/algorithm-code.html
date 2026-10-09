@@ -1,0 +1,64 @@
+<section class="source-panel" [class.compact]="compact()" [attr.aria-label]="label()">
+  <div class="source-heading">
+    <div>
+      <span>FOLLOW THE EXECUTION</span>
+      <h3>The code, line by line.</h3>
+    </div>
+    <button type="button" (click)="copy()">Copy code</button>
+  </div>
+  <div class="source-tabs" role="tablist" aria-label="Code language">
+    @for (implementation of implementations(); track implementation.language) {
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="language() === implementation.language"
+        [class.selected]="language() === implementation.language"
+        (click)="selectLanguage(implementation.language)"
+      >
+        {{ implementation.label }}
+      </button>
+    }
+    <span>EXECUTING LINE {{ activeLine() + 1 }}</span>
+  </div>
+  <div
+    class="code-body"
+    #codeBody
+    role="tabpanel"
+    [attr.aria-label]="source().label + ' implementation'"
+    tabindex="0"
+  >
+    @for (line of source().lines; track $index; let i = $index) {
+      <div
+        class="source-line"
+        [class.executing]="line.key === codeKey()"
+        [attr.data-line]="i"
+        [attr.aria-current]="line.key === codeKey() ? 'step' : null"
+      >
+        <span class="line-number">{{ i + 1 }}</span
+        ><code>{{ line.text || ' ' }}</code>
+      </div>
+    }
+  </div>
+  <div class="source-note">
+    Amber marks the current operation. Follow its effect in the visualization and memory blocks.
+    @if (language() === 'java') {
+      <span>Java 17+ · save copied code as Solution.java.</span>
+    }
+    @if (language() === 'csharp') {
+      <span>C# 10+ · run copied code in a .NET 6+ console project.</span>
+    }
+  </div>
+  <details class="source-input">
+    <summary>
+      Current input as runnable code
+      @if (language() === 'java') {
+        <small> · Java 17+ · Solution.java</small>
+      }
+      @if (language() === 'csharp') {
+        <small> · C# 10+ / .NET 6+</small>
+      }
+    </summary>
+    <pre>{{ inputCode() }}</pre>
+  </details>
+  <p class="copy-status" role="status">{{ copyStatus() }}</p>
+</section>

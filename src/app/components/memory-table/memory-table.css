@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+.table-scroll {
+  overflow: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  color: var(--text-muted, #52777d);
+  font:
+    12px 'DM Mono',
+    monospace;
+}
+th,
+td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--border, #e0ece6);
+  text-align: left;
+}
+th {
+  font-size: 11px;
+  color: var(--text-muted, #80999c);
+}
+[data-state='active'] {
+  background: var(--surface-warning, #fff0cc);
+}
+[data-state='visited'] {
+  background: var(--surface-accent, #dff4eb);
+}

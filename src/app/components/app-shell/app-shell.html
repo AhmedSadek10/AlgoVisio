@@ -1,0 +1,102 @@
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/algorithms/binary-search">
+      <span class="brand-mark">✳</span>
+      <span>Algo<strong>Visio</strong><small>LEARN BY SEEING</small></span>
+    </a>
+
+    <div class="side-label">CATEGORIES</div>
+    <label class="search-box">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m16 16 4 4" />
+      </svg>
+      <input
+        aria-label="Search"
+        placeholder="Search"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+      />
+    </label>
+    <nav aria-label="Algorithm categories">
+      @for (category of visibleCategories(); track category.name) {
+        <div class="category-group">
+          <div class="category-label">{{ category.name }}</div>
+          <div class="topic-list">
+            @for (topic of category.topics; track topic.slug) {
+              @if (topic.available) {
+                <a
+                  class="topic"
+                  [routerLink]="'/algorithms/' + topic.slug"
+                  routerLinkActive="current"
+                >
+                  <span class="topic-symbol">{{ topic.icon }}</span>
+                  <span>{{ topic.name }}</span>
+                </a>
+              } @else {
+                <button class="topic" type="button" (click)="showComingSoon(topic.name)">
+                  <span class="topic-symbol">{{ topic.icon }}</span>
+                  <span>{{ topic.name }}<small>Coming soon</small></span>
+                  <i title="Coming soon"></i>
+                </button>
+              }
+            }
+          </div>
+        </div>
+      } @empty {
+        <p class="empty">No matching lessons.</p>
+      }
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="side-footer">BUILT FOR CURIOUS MINDS ✳</div>
+    </div>
+  </aside>
+
+  <main id="top">
+    <header class="topbar">
+      <div>
+        Learn <span>/</span> {{ currentTopic().category }} <span>/</span>
+        <strong>{{ currentTopic().name }}</strong>
+      </div>
+      <div class="topbar-actions">
+        <div class="lesson-tag"><i></i> INTERACTIVE LESSON</div>
+        <button
+          class="theme-toggle"
+          type="button"
+          [attr.aria-pressed]="theme.isDark()"
+          [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+          [title]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+          (click)="theme.toggle()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            @if (theme.isDark()) {
+              <circle cx="12" cy="12" r="4" />
+              <path
+                d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"
+              />
+            } @else {
+              <path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z" />
+            }
+          </svg>
+          <span>{{ theme.isDark() ? 'Light mode' : 'Dark mode' }}</span>
+        </button>
+      </div>
+    </header>
+    <nav #mobileNav class="mobile-nav" aria-label="Algorithm lessons">
+      @for (category of mobileCategories; track category.name) {
+        <span class="mobile-nav-category">{{ category.name }}</span>
+        @for (topic of category.topics; track topic.slug) {
+          <a [routerLink]="'/algorithms/' + topic.slug" routerLinkActive="current">{{
+            topic.name
+          }}</a>
+        }
+      }
+    </nav>
+    <router-outlet />
+  </main>
+
+  @if (notice()) {
+    <div class="toast" role="status">{{ notice() }}</div>
+  }
+</div>

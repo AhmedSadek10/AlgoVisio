@@ -1,0 +1,24 @@
+@let state = snapshot();
+@if (state.kind === 'heap') {
+  <app-heap-visualizer [snapshot]="state" />
+} @else if (state.kind === 'tree') {
+  <app-tree-visualizer [snapshot]="state" />
+} @else if (state.kind === 'graph') {
+  <app-graph-visualizer [snapshot]="state" (nodeSelect)="nodeSelect.emit($event)" />
+} @else if (state.kind === 'map') {
+  <app-memory-table [columns]="state.columns" [rows]="state.rows" />
+} @else if (state.kind === 'stack') {
+  <app-stack-visualizer
+    [items]="state.items"
+    [operation]="state.operation || ''"
+    [removed]="state.removed || null"
+  />
+} @else if (state.kind === 'queue') {
+  <app-queue-visualizer
+    [items]="state.items"
+    [operation]="state.operation || ''"
+    [removed]="state.removed || null"
+  />
+} @else {
+  <app-sequence-visualizer [snapshot]="state" />
+}

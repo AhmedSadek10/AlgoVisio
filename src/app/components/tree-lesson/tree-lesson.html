@@ -1,0 +1,190 @@
+<div class="graph-page">
+  <app-algorithm-intro [algorithm]="lesson().algorithm" />
+  <article class="lesson-article">
+    <div class="article-main">
+      <span class="section-kicker">THE CONCEPT</span>
+      <h2>{{ lesson().articleTitle }}</h2>
+      @for (paragraph of lesson().article; track $index) {
+        <p>{{ paragraph }}</p>
+      }
+      <button class="article-jump" type="button" (click)="workspace.expanded.set(true)">
+        Open full-view dry run ↓
+      </button>
+    </div>
+    <aside class="article-aside">
+      <span class="aside-symbol">⑂</span>
+      <h3>Keep in mind</h3>
+      @for (takeaway of lesson().takeaways; track takeaway) {
+        <div class="takeaway">✓ {{ takeaway }}</div>
+      }
+    </aside>
+  </article>
+  <ng-template #treePanel><app-data-structure-visualizer [snapshot]="tree()" /></ng-template>
+  <ng-template #stackPanel><app-data-structure-visualizer [snapshot]="stack()" /></ng-template>
+  <ng-template #outputPanel>
+    @if (step().result) {
+      <p role="status">{{ step().result }}</p>
+    }
+    <app-data-structure-visualizer [snapshot]="output()" />
+  </ng-template>
+  <ng-template #codePanel
+    ><app-algorithm-code
+      [compact]="true"
+      [implementations]="code()"
+      [codeKey]="step().key"
+      [language]="language()"
+      (languageChange)="language.set($event)"
+      [inputCode]="inputCode()"
+  /></ng-template>
+  <ng-template #explanationPanel
+    ><app-step-explanation
+      [title]="step().title"
+      [explanation]="step().explanation"
+      [phase]="lesson().operation ?? order()"
+  /></ng-template>
+  <ng-template #memoryPanel><app-memory-table [columns]="columns" [rows]="memory()" /></ng-template>
+  <app-algorithm-workspace #workspace [title]="lesson().algorithm.name + ' · dry run'">
+    <div class="graph-toolbar">
+      <div class="preset-group">
+        <span class="field-label">TRY A TREE</span>
+        <div class="preset-buttons">
+          @for (example of examples(); track example.label) {
+            <button
+              type="button"
+              [class.selected]="selectedExample() === example.label"
+              [attr.aria-pressed]="selectedExample() === example.label"
+              (click)="selectExample(example)"
+            >
+              {{ example.label }}
+            </button>
+          }
+        </div>
+      </div>
+      @if (!lesson().operation) {
+        <div class="preset-group">
+          <span class="field-label">VISIT ORDER</span>
+          <div class="preset-buttons">
+            @for (mode of orders; track mode) {
+              <button
+                type="button"
+                [class.selected]="order() === mode"
+                [attr.aria-pressed]="order() === mode"
+                (click)="selectOrder(mode)"
+              >
+                {{ mode }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+    <section class="current-example" aria-label="Current example" aria-live="polite">
+      <div class="example-heading">
+        <span class="section-kicker">CURRENT EXAMPLE</span>
+        <strong>{{ selectedExample() }}</strong>
+        <span class="example-count">{{ nodes().length }} nodes</span>
+      </div>
+      <div class="example-values">
+        <span>Tree · level order</span>
+        <code>[{{ appliedInput() }}]</code>
+      </div>
+      @if (lesson().operation === 'search') {
+        <div class="example-target">Search target <strong>{{ query().target }}</strong></div>
+      } @else if (lesson().operation === 'ancestor') {
+        <div class="example-target">{{ appliedTargets() }}</div>
+      } @else if (!lesson().operation) {
+        <div class="example-target">Visit order <strong>{{ order() }}</strong></div>
+      }
+    </section>
+    <details class="input-editor">
+      <summary>Change tree input · {{ nodes().length }} nodes</summary>
+      <section class="graph-builder">
+        <div class="builder-heading">
+          <div>
+            <h2>Build your own binary tree.</h2>
+            <p>
+              Enter values in level order, using null for missing children. Only real nodes receive
+              child slots, from left to right.
+            </p>
+          </div>
+        </div>
+        <div class="builder-fields">
+          <label
+            ><span>LEVEL-ORDER VALUES</span
+            ><input
+              maxlength="250"
+              [value]="draft()"
+              (input)="editTree($any($event.target).value)"
+              placeholder="1, null, 2, 3"
+          /></label>
+          @if (lesson().operation === 'search') {
+            <label
+              ><span>SEARCH TARGET</span
+              ><input
+                type="number"
+                min="-999"
+                max="999"
+                [value]="targetDraft()"
+                (input)="targetDraft.set($any($event.target).value)"
+            /></label>
+          }
+          @if (lesson().operation === 'ancestor') {
+            <label
+              ><span>FIRST NODE (p)</span
+              ><select (change)="selectAncestorTarget('first', $any($event.target).value)">
+                <option value="" disabled [selected]="firstDraft() === ''">Choose a node</option>
+                @for (node of draftNodes(); track node.id) {
+                  <option [value]="node.id" [selected]="firstDraft() === node.id">
+                    {{ node.value }} (node {{ node.id }})
+                  </option>
+                }
+              </select></label
+            >
+            <label
+              ><span>SECOND NODE (q)</span
+              ><select (change)="selectAncestorTarget('second', $any($event.target).value)">
+                <option value="" disabled [selected]="secondDraft() === ''">Choose a node</option>
+                @for (node of draftNodes(); track node.id) {
+                  <option [value]="node.id" [selected]="secondDraft() === node.id">
+                    {{ node.value }} (node {{ node.id }})
+                  </option>
+                }
+              </select></label
+            >
+          }
+        </div>
+        <div class="builder-actions">
+          <button type="button" (click)="apply()">Apply tree →</button>
+        </div>
+        @if (error()) {
+          <p class="builder-error" role="alert">{{ error() }}</p>
+        }
+        <p class="builder-tip">
+          Up to 31 slots. Whole numbers from -999 to 999;
+          {{
+            lesson().operation === 'search'
+              ? 'use unique values in BST order.'
+              : 'duplicates are allowed.'
+          }}
+          For 1, null, 2, 3: 2 is the right child of 1, and 3 is the left child of 2. Enter null for
+          an empty tree.
+        </p>
+      </section>
+    </details>
+    <app-playback-controls
+      [index]="playback.index()"
+      [total]="steps().length"
+      [playing]="playback.isPlaying()"
+      [speed]="playback.speed()"
+      (reset)="playback.reset()"
+      (previous)="playback.previous()"
+      (next)="playback.next()"
+      (play)="playback.togglePlay()"
+      (seek)="playback.seek($event)"
+      (speedChange)="playback.setSpeed($event)"
+    />
+    <app-algorithm-workbench [panels]="panels()" />
+  </app-algorithm-workspace>
+  <app-lesson-practice [problems]="lesson().practice" />
+  <footer>ALGOVISIO <span>·</span> MADE TO MAKE ALGORITHMS CLICK</footer>
+</div>

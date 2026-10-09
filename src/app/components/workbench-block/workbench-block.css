@@ -1,0 +1,65 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  border: 1px solid var(--border, #cfdfdc);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface, #fff);
+  box-shadow: 0 3px 12px #31596808;
+}
+.block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--surface-subtle, #edf5f2);
+  border-bottom: 1px solid var(--border, #dce8e3);
+  cursor: grab;
+  user-select: none;
+}
+.drag-grip {
+  color: var(--text-muted, #7b9893);
+  font-size: 21px;
+}
+strong {
+  color: var(--text-primary, #3c676a);
+  font-size: 13px;
+}
+.block-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+  scrollbar-width: thin;
+}
+.resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: var(--surface-subtle, #e4f2ed);
+  color: var(--text-muted, #4b9183);
+  cursor: nwse-resize;
+  touch-action: none;
+  border-radius: 7px 0 0;
+  font-size: 15px;
+}
+.resizing {
+  border-color: var(--border-accent, #1cad98);
+}
+button:focus-visible {
+  outline: 2px solid var(--border-accent, #159b89);
+  outline-offset: -2px;
+}
+.block-header {
+  touch-action: none;
+}

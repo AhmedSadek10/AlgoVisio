@@ -1,0 +1,20 @@
+<div class="table-scroll">
+  <table aria-label="Algorithm memory">
+    <thead>
+      <tr>
+        @for (column of columns(); track column.key) {
+          <th>{{ column.label }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.id) {
+        <tr [attr.data-state]="row.state || 'idle'">
+          @for (column of columns(); track column.key) {
+            <td>{{ row.cells[column.key] }}</td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

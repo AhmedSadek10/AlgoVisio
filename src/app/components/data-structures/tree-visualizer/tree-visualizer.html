@@ -1,0 +1,49 @@
+<div class="tree" aria-label="Tree visualization">
+  @if (snapshot().nodes.length) {
+    @if (hasLongestPath()) {
+      <div class="path-legend"><span aria-hidden="true"></span>Longest path</div>
+    }
+    <svg
+      [attr.viewBox]="'0 0 ' + layout().width + ' ' + layout().height"
+      [style.min-width.px]="layout().width > 500 ? layout().width : null"
+      role="img"
+      aria-label="Parent and child relationships"
+    >
+      @for (edge of layout().edges; track edge.to.id) {
+        <line
+          [class.highlighted]="edge.from.state === 'found' && edge.to.state === 'found'"
+          [attr.x1]="edge.from.x"
+          [attr.y1]="edge.from.y"
+          [attr.x2]="edge.to.x"
+          [attr.y2]="edge.to.y"
+        />
+      }
+      @for (node of layout().nodes; track node.id) {
+        <g
+          [style.transform]="'translate(' + node.x + 'px, ' + node.y + 'px)'"
+          [attr.data-state]="node.state || 'idle'"
+        >
+          <title>{{ node.label }} {{ node.detail }} {{ node.marker }}</title>
+          @if (node.marker !== 'Longest path') {
+            <text class="marker" y="-34">{{ node.marker }}</text>
+          }
+          <circle r="25" />
+          <text class="label" y="6">{{ node.label }}</text>
+          @if (node.detail) {
+            <rect
+              class="detail-badge"
+              [attr.x]="-(node.detail.length * 6 + 18) / 2"
+              y="31"
+              [attr.width]="node.detail.length * 6 + 18"
+              height="22"
+              rx="11"
+            />
+            <text class="detail" y="46">{{ node.detail }}</text>
+          }
+        </g>
+      }
+    </svg>
+  } @else {
+    <p class="empty">No nodes yet</p>
+  }
+</div>

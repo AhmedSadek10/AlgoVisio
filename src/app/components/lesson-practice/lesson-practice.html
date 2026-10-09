@@ -1,0 +1,19 @@
+<section class="practice-card" aria-label="LeetCode practice">
+  <span class="section-kicker">PRACTICE NEXT</span>
+  <h2>Try it on LeetCode.</h2>
+  <p>Apply what you learned with these practice problems.</p>
+  @for (problem of problems(); track problem.number) {
+    <a [href]="problem.url" target="_blank" rel="noopener noreferrer">
+      <span class="problem-number">#{{ problem.number }}</span>
+      <div class="problem-detail">
+        <strong>{{ problem.title }}</strong>
+        <small>{{ problem.relevance }}</small>
+      </div>
+      <span class="difficulty" [attr.data-difficulty]="problem.difficulty">{{
+        problem.difficulty
+      }}</span>
+      <span class="external-arrow" aria-hidden="true">↗</span>
+      <span class="sr-only">(opens in a new tab)</span>
+    </a>
+  }
+</section>

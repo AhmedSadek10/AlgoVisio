@@ -1,0 +1,201 @@
+<div class="graph-page">
+  <app-algorithm-intro [algorithm]="lesson().algorithm" />
+
+  <article class="lesson-article" aria-label="About {{ lesson().algorithm.name }}">
+    <div class="article-main">
+      <span class="section-kicker">THE CONCEPT</span>
+      <h2>{{ lesson().articleTitle }}</h2>
+      @for (paragraph of lesson().article; track $index) {
+        <p>{{ paragraph }}</p>
+      }
+      <button type="button" class="article-jump" (click)="workspace.expanded.set(true)">
+        Open full-view dry run ↓
+      </button>
+    </div>
+    <aside class="article-aside">
+      <span class="aside-symbol">✳</span>
+      <h3>Keep in mind</h3>
+      @for (takeaway of lesson().takeaways; track takeaway) {
+        <div class="takeaway"><span>✓</span>{{ takeaway }}</div>
+      }
+    </aside>
+  </article>
+
+  <ng-template #graphPanel
+    ><app-data-structure-visualizer [snapshot]="graphView()" (nodeSelect)="selectStart($event)"
+  /></ng-template>
+  <ng-template #frontierPanel
+    ><app-data-structure-visualizer [snapshot]="frontierView()"
+  /></ng-template>
+  <ng-template #codePanel
+    ><app-algorithm-code
+      [compact]="true"
+      [implementations]="lesson().implementations"
+      [codeKey]="step().trace?.codeKey || step().dryRun?.codeKey || step().codeLine.toString()"
+      [inputCode]="inputCode()"
+      [language]="codeLanguage()"
+      (languageChange)="codeLanguage.set($event)"
+      [label]="lesson().algorithm.name + ' source code'"
+  /></ng-template>
+  <ng-template #explanationPanel
+    ><app-step-explanation
+      [title]="step().title"
+      [explanation]="step().explanation"
+      [phase]="step().phase"
+      [variables]="variables()"
+      [comparison]="comparison()"
+      [result]="result()"
+  /></ng-template>
+  <ng-template #memoryPanel
+    ><app-memory-table [columns]="memoryColumns()" [rows]="memory()"
+  /></ng-template>
+  <ng-template #orderPanel
+    ><app-array-visualizer
+      [items]="orderItems()"
+      [operation]="
+        spanning()
+          ? 'Accepted edges and their weights'
+          : lesson().kind === 'bellman-ford'
+            ? 'Destination nodes in update order'
+            : 'Nodes in the order they were visited'
+      "
+  /></ng-template>
+  <ng-template #treePanel><app-data-structure-visualizer [snapshot]="treeView()" /></ng-template>
+  <app-algorithm-workspace
+    #workspace
+    id="visualizer"
+    [title]="lesson().algorithm.name + ' · dry run'"
+  >
+    <div class="graph-toolbar">
+      <div class="preset-group">
+        <span class="field-label">TRY A GRAPH</span>
+        <div class="preset-buttons">
+          @for (example of lesson().examples; track example.label; let i = $index) {
+            <button
+              type="button"
+              [class.selected]="selectedExample() === i"
+              [attr.aria-pressed]="selectedExample() === i"
+              (click)="selectExample(i)"
+            >
+              {{ example.label }}
+            </button>
+          }
+        </div>
+      </div>
+      @if (!spanning()) {
+        <label class="selector-group"
+          ><span class="field-label">START NODE</span
+          ><select [value]="start()" (change)="selectStart($any($event.target).value)">
+            @for (node of graph().nodes; track node) {
+              <option [value]="node" [selected]="node === start()">{{ node }}</option>
+            }
+          </select></label
+        >
+      }
+      @if (shortestPath()) {
+        <label class="selector-group"
+          ><span class="field-label">TARGET NODE</span
+          ><select [value]="target()" (change)="selectTarget($event)">
+            @for (node of graph().nodes; track node) {
+              <option [value]="node" [selected]="node === target()">{{ node }}</option>
+            }
+          </select></label
+        >
+      }
+    </div>
+    <section class="current-example" aria-label="Current example" aria-live="polite">
+      <div class="example-heading">
+        <span class="section-kicker">CURRENT EXAMPLE</span>
+        <strong>{{ lesson().examples[selectedExample()]?.label ?? 'Custom graph' }}</strong>
+        <span class="example-count">
+          {{ graph().nodes.length }} nodes · {{ graph().edges.length }} edges
+        </span>
+      </div>
+      <div class="example-target">
+        {{ graph().directed ? 'Directed' : 'Undirected' }}{{ weighted() ? ' · weighted' : '' }}
+        @if (!spanning()) {
+          · Start <strong>{{ start() }}</strong>
+        }
+        @if (shortestPath()) {
+          · Target <strong>{{ target() }}</strong>
+        }
+      </div>
+    </section>
+    <details class="input-editor">
+      <summary>
+        Change graph input · {{ graph().nodes.length }}
+        {{ graph().nodes.length === 1 ? 'node' : 'nodes' }}
+      </summary>
+      <section class="graph-builder" aria-labelledby="builder-heading">
+        <div class="builder-heading">
+          <div>
+            <span class="section-kicker">MAKE IT YOURS</span>
+            <h2 id="builder-heading">Build your own graph.</h2>
+            <p>Add nodes and edges, then choose where the algorithm begins.</p>
+          </div>
+          <span class="builder-badge">UP TO 12 NODES</span>
+        </div>
+        <div class="builder-fields">
+          <label
+            ><span>NODES <small>comma or space separated</small></span
+            ><input
+              type="text"
+              maxlength="140"
+              [value]="nodesDraft()"
+              (input)="setNodesDraft($event)"
+              placeholder="A, B, C, D"
+          /></label>
+          <label
+            ><span
+              >EDGES <small>one per line · FROM TO{{ weighted() ? ' WEIGHT' : '' }}</small></span
+            ><textarea
+              rows="6"
+              [value]="edgesDraft()"
+              (input)="setEdgesDraft($event)"
+              [placeholder]="weighted() ? 'A B 4\nA C 2\nB D 5' : 'A B\nA C\nB D'"
+            ></textarea>
+          </label>
+        </div>
+        <div class="builder-actions">
+          <label class="directed-toggle"
+            ><input
+              type="checkbox"
+              [checked]="directedDraft()"
+              [disabled]="spanning()"
+              (change)="setDirectedDraft($event)"
+            />
+            Directed edges</label
+          ><button type="button" (click)="applyGraph()">Apply graph <span>→</span></button>
+        </div>
+        @if (error()) {
+          <p class="builder-error" role="alert">{{ error() }}</p>
+        }
+        <p class="builder-tip">
+          {{
+            lesson().kind === 'bellman-ford' || spanning()
+              ? 'Use whole-number weights from -99 to 99. Missing weights default to 1.'
+              : lesson().kind === 'dijkstra'
+                ? 'Use whole-number weights from 0 to 99. Missing weights default to 1. Negative weights are rejected.'
+                : 'Edges are explored in the order you enter them. Isolated nodes are allowed.'
+          }}
+          Invalid input leaves the current graph in place.
+        </p>
+      </section>
+    </details>
+    <app-playback-controls
+      [index]="playback.index()"
+      [total]="steps().length"
+      [playing]="playback.isPlaying()"
+      [speed]="playback.speed()"
+      (reset)="playback.reset()"
+      (previous)="playback.previous()"
+      (next)="playback.next()"
+      (play)="playback.togglePlay()"
+      (seek)="playback.seek($event)"
+      (speedChange)="playback.setSpeed($event)"
+    />
+    <app-algorithm-workbench [panels]="panels()" />
+  </app-algorithm-workspace>
+  <app-lesson-practice [problems]="lesson().practice" />
+  <footer>ALGOVISIO <span>·</span> MADE TO MAKE ALGORITHMS CLICK</footer>
+</div>

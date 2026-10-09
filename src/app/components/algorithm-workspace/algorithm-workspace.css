@@ -1,0 +1,76 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.workspace {
+  position: relative;
+  padding: 18px;
+  margin-bottom: 22px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dce8e4);
+  border-radius: 15px;
+  box-shadow: 0 8px 34px #31596808;
+  overflow: auto;
+  min-width: 300px;
+  max-width: 100%;
+  min-height: 420px;
+}
+.workspace-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+h2 {
+  font-size: 23px;
+  margin: 0;
+  color: var(--text-accent, #244852);
+  letter-spacing: -0.03em;
+}
+.workspace-actions {
+  display: flex;
+  gap: 6px;
+}
+.workspace-actions button {
+  border: 1px solid var(--border, #cce2da);
+  background: var(--surface-accent, #edf7f2);
+  color: var(--text-accent, #267e6f);
+  border-radius: 7px;
+  padding: 7px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.expanded {
+  position: fixed;
+  inset: 12px;
+  width: calc(100vw - 24px) !important;
+  height: calc(100vh - 24px) !important;
+  max-width: none;
+  z-index: 100;
+  box-shadow: 0 0 0 100vmax #183c4266;
+}
+.resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 9px 0 0;
+  background: var(--surface-accent, #d8eee5);
+  color: var(--text-accent, #387e70);
+  cursor: nwse-resize;
+  touch-action: none;
+  font-size: 20px;
+}
+button:focus-visible {
+  outline: 2px solid var(--border-accent, #159b89);
+  outline-offset: -3px;
+}
+@media (max-width: 570px) {
+  .workspace {
+    padding: 12px;
+  }
+}

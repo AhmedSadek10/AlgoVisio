@@ -1,0 +1,145 @@
+<div class="graph-page">
+  <app-algorithm-intro [algorithm]="lesson().algorithm" />
+  <article class="lesson-article" [attr.aria-label]="'About ' + lesson().algorithm.name">
+    <div class="article-main">
+      <span class="section-kicker">THE CONCEPT</span>
+      <h2>Watch order emerge, one decision at a time.</h2>
+      @for (paragraph of lesson().article; track $index) {
+        <p>{{ paragraph }}</p>
+      }
+      <button class="article-jump" type="button" (click)="workspace.expanded.set(true)">
+        Open full-view dry run ↓
+      </button>
+    </div>
+    <aside class="article-aside">
+      <span class="aside-symbol">⇅</span>
+      <h3>Keep in mind</h3>
+      @for (takeaway of lesson().takeaways; track takeaway) {
+        <div class="takeaway"><span>✓</span>{{ takeaway }}</div>
+      }
+    </aside>
+  </article>
+  <ng-template #arrayPanel><app-data-structure-visualizer [snapshot]="array()" /></ng-template>
+  <ng-template #originalPanel
+    ><app-data-structure-visualizer [snapshot]="original()"
+  /></ng-template>
+  <ng-template #codePanel
+    ><app-algorithm-code
+      [compact]="true"
+      [implementations]="lesson().implementations"
+      [codeKey]="step().key"
+      [language]="language()"
+      (languageChange)="language.set($event)"
+      [inputCode]="inputCode()"
+      [label]="lesson().algorithm.name + ' source code'"
+  /></ng-template>
+  <ng-template #explanationPanel
+    ><app-step-explanation
+      [title]="step().title"
+      [explanation]="step().explanation"
+      [variables]="variables()"
+      [phase]="step().key === 'done' ? 'complete' : 'sorting'"
+      [result]="step().key === 'done' ? step().values.join(', ') : ''"
+  /></ng-template>
+  <ng-template #memoryPanel><app-memory-table [columns]="columns" [rows]="memory()" /></ng-template>
+  <ng-template #buffersPanel>
+    @if (step().buffers) {
+      <p class="buffer-legend">Amber: next value · Teal: copied to the destination</p>
+      <div class="merge-buffers">
+        @for (buffer of [leftBuffer(), rightBuffer()]; track $index) {
+          <section [attr.aria-label]="buffer.operation">
+            <h3>{{ $index === 0 ? 'Left half' : 'Right half' }}</h3>
+            <div class="buffer-values">
+              @for (item of buffer.items; track item.id) {
+                <div class="buffer-value" [attr.data-state]="item.state">
+                  <span>{{ item.marker || ' ' }}</span>
+                  <strong>{{ item.label }}</strong>
+                  <small>{{ item.id }}</small>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    } @else {
+      <p>Temporary arrays appear when two sorted halves are ready to merge.</p>
+    }
+  </ng-template>
+  <app-algorithm-workspace #workspace [title]="lesson().algorithm.name + ' · dry run'">
+    <div class="graph-toolbar">
+      <div class="preset-group">
+        <span class="field-label">TRY AN ARRAY</span>
+        <div class="preset-buttons">
+          @for (example of examples(); track example.label; let i = $index) {
+            <button
+              type="button"
+              [class.selected]="selectedExample() === i"
+              [attr.aria-pressed]="selectedExample() === i"
+              (click)="selectExample(i)"
+            >
+              {{ example.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+    <section class="current-example" aria-label="Current example" aria-live="polite">
+      <div class="example-heading">
+        <span class="section-kicker">CURRENT EXAMPLE</span>
+        <strong>{{ examples()[selectedExample()]?.label ?? 'Custom array' }}</strong>
+        <span class="example-count">{{ values().length }} values</span>
+      </div>
+      <div class="example-values">
+        <span>Starting array · sort in ascending order</span>
+        <code>[{{ values().join(', ') }}]</code>
+      </div>
+    </section>
+    <details class="input-editor">
+      <summary>Change array input · {{ values().length }} values</summary>
+      <section class="graph-builder">
+        <div class="builder-heading">
+          <div>
+            <h2>Sort your own values.</h2>
+            <p>Enter up to 16 values. The dry run starts in the exact order you provide.</p>
+          </div>
+        </div>
+        <div class="builder-fields">
+          <label
+            ><span>VALUES <small>comma or space separated</small></span
+            ><input
+              maxlength="180"
+              [value]="draft()"
+              (input)="draft.set($any($event.target).value)"
+              (keydown.enter)="apply()"
+              placeholder="29, 10, 14, 37, 13, 5"
+          /></label>
+        </div>
+        <div class="builder-actions">
+          <button type="button" (click)="apply()">Apply array →</button>
+        </div>
+        @if (error()) {
+          <p class="builder-error" role="alert">{{ error() }}</p>
+        }
+        <p class="builder-tip">
+          Whole numbers from -999 to 999; duplicates are allowed. Invalid edits preserve the current
+          input. Comparisons count value checks, and array writes count changes to array slots.
+        </p>
+      </section>
+    </details>
+    <app-playback-controls
+      [index]="playback.index()"
+      [total]="steps().length"
+      [playing]="playback.isPlaying()"
+      [speed]="playback.speed()"
+      (reset)="playback.reset()"
+      (previous)="playback.previous()"
+      (next)="playback.next()"
+      (play)="playback.togglePlay()"
+      (seek)="playback.seek($event)"
+      (speedChange)="playback.setSpeed($event)"
+    />
+    <app-algorithm-workbench [panels]="panels()" />
+  </app-algorithm-workspace>
+  <app-lesson-practice [problems]="lesson().practice" />
+  <footer>ALGOVISIO <span>·</span> MADE TO MAKE ALGORITHMS CLICK</footer>
+</div>

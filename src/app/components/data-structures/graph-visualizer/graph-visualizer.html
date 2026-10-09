@@ -1,0 +1,127 @@
+<section class="graph-board">
+  <div class="caption">
+    <button
+      type="button"
+      class="reset-positions"
+      [disabled]="!hasCustomPositions()"
+      (click)="resetPositions()"
+    >
+      Reset positions
+    </button>
+    <strong>YOUR GRAPH</strong
+    ><span
+      >{{ snapshot().nodes.length }} {{ snapshot().nodes.length === 1 ? 'node' : 'nodes' }} ·
+      {{ snapshot().edges.length }} {{ snapshot().edges.length === 1 ? 'edge' : 'edges' }} ·
+      {{ snapshot().directed ? 'directed' : 'undirected' }}</span
+    >
+  </div>
+  <svg
+    [attr.viewBox]="'0 0 ' + layout().width + ' ' + layout().height"
+    role="group"
+    aria-label="Graph visualization"
+  >
+    <defs>
+      <pattern [id]="identifier + '-dots'" width="26" height="26" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="1" fill="var(--border, #d7e6e7)" />
+      </pattern>
+      <marker
+        [id]="identifier + '-arrow'"
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="9"
+        markerHeight="9"
+        orient="auto-start-reverse"
+        markerUnits="userSpaceOnUse"
+      >
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted, #7eaaa4)" />
+      </marker>
+    </defs>
+    <rect
+      x="0"
+      y="0"
+      [attr.width]="layout().width"
+      [attr.height]="layout().height"
+      [attr.fill]="'url(#' + identifier + '-dots)'"
+      (click)="clearSelection()"
+    />
+    @for (edge of layout().edges; track edge.id) {
+      <g class="edge" [attr.data-state]="edge.state || 'idle'">
+        <path
+          [attr.d]="edge.path"
+          [attr.marker-end]="snapshot().directed ? 'url(#' + identifier + '-arrow)' : null"
+        />
+        @if (edge.label) {
+          <circle class="weight" [attr.cx]="edge.labelX" [attr.cy]="edge.labelY" r="15" />
+          <text [attr.x]="edge.labelX" [attr.y]="edge.labelY + 5">{{ edge.label }}</text>
+        }
+      </g>
+    }
+    @for (node of layout().nodes; track node.id) {
+      <g
+        class="node"
+        tabindex="0"
+        role="button"
+        [class.selected]="selectedNode() === node.id"
+        [class.dragging]="draggingNode() === node.id"
+        [attr.aria-pressed]="selectedNode() === node.id"
+        [attr.aria-label]="
+          snapshot().selectable === false
+            ? 'Select ' + node.label
+            : 'Set ' + node.label + ' as start'
+        "
+        [attr.data-state]="node.state || 'idle'"
+        (click)="selectNode(node.id)"
+        (pointerdown)="beginDrag($event, node.id)"
+        (pointermove)="moveDrag($event)"
+        (pointerup)="endDrag($event)"
+        (pointercancel)="endDrag($event)"
+        (lostpointercapture)="endDrag($event)"
+        (keydown)="moveByKey($event, node.id)"
+        (keydown.enter)="selectNode(node.id, false)"
+        (keydown.space)="$event.preventDefault(); selectNode(node.id, false)"
+      >
+        <title>{{ node.label }} {{ node.detail }} {{ node.marker }}</title>
+        @if (selectedNode() === node.id) {
+          <circle
+            class="selection-ring"
+            [attr.cx]="node.x"
+            [attr.cy]="node.y"
+            [attr.r]="nodeRadius + 7"
+          />
+        }
+        <circle class="disc" [attr.cx]="node.x" [attr.cy]="node.y" [attr.r]="nodeRadius" />
+        <text
+          class="label"
+          [style.font-size.px]="node.labelSize"
+          [attr.x]="node.x"
+          [attr.y]="node.y + (node.detail ? -4 : 6)"
+        >
+          {{ node.label }}
+        </text>
+        @if (node.detail) {
+          <text
+            class="detail"
+            [style.font-size.px]="node.detailSize"
+            [attr.x]="node.x"
+            [attr.y]="node.y + 18"
+          >
+            {{ node.detail }}
+          </text>
+        }
+        @if (node.marker) {
+          <text class="marker" [attr.x]="node.x" [attr.y]="node.y + nodeRadius + 16">
+            {{ node.marker }}
+          </text>
+        }
+      </g>
+    }
+  </svg>
+  <div class="legend">
+    <span>Amber: inspecting</span><span>Teal: visited / path</span>
+    <span>Drag nodes to arrange · Arrow keys move a focused node</span>
+    @if (snapshot().selectable !== false) {
+      <span>Click a node to set the start</span>
+    }
+  </div>
+</section>

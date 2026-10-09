@@ -1,0 +1,21 @@
+<section class="decision" aria-live="polite" aria-label="Current dry run step">
+  <header>
+    <h3>{{ title() }}</h3>
+    <span>{{ phase() }}</span>
+  </header>
+  <p>{{ explanation() }}</p>
+  <div class="variables">
+    @for (variable of variables(); track variable.name) {
+      <span
+        ><code>{{ variable.name }}</code
+        ><b>{{ variable.value }}</b></span
+      >
+    }
+  </div>
+  @if (comparison()) {
+    <p class="comparison">{{ comparison() }}</p>
+  }
+  @if (result()) {
+    <p class="result">{{ result() }}</p>
+  }
+</section>
